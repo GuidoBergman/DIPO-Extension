@@ -1,0 +1,24 @@
+{
+  "manifest_version": 2,
+  "name": "DIPO",
+  "description": "Detect and classify persuasion techniques in text",
+  "version": "0.0.1",
+  "icons": {
+    "64": "icons/icon.png"
+  },
+  "browser_action": {
+    "default_icon": {
+      "64": "icons/icon.png"
+    },
+    "default_popup": "browserAction/index.html",
+    "default_title": "DIPO",
+    "default_area": "navbar"
+  },
+  "options_ui": {
+    "page": "options/index.html"
+  },
+  "content_scripts": [{
+    "matches": ["<all_urls>"],
+    "js": ["content-script.js"]
+}]
+}

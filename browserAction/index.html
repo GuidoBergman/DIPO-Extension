@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>DIPO</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@1.0.0/css/bulma.min.css">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="container" id="page">
+    <section class="section">
+      <div class="container">
+        <h1 class="title has-text-centered">
+          Persuasion techniques analysis
+        </h1>
+        <p class="subtitle has-text-centered">
+          Enter text to analyze for <strong>persuasion techniques</strong>
+        </p>
+      </div>
+    </section>
+    
+
+    <div class="field">
+      <div class="control">
+        <textarea class="textarea is-medium is-rounded" type="text" placeholder="Enter text here" rows="4" required id="input-text"></textarea>
+      </div>
+    </div>
+    <div class="field">
+      <div class="control has-text-centered">
+        <button class="button is-medium is-rounded" id="submit-button">Analyze</button>
+      </div>
+    </div>
+    
+    
+    
+    <div class="modal" id="loadingModal">
+      <div class="modal-background"></div>
+      <div class="modal-content">
+        <div class="box has-text-centered">
+          <span class="icon is-large">
+            <svg class="spinner" id="spinner-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--!Font Awesome Free 6.5.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2024 Fonticons, Inc.--><path d="M304 48a48 48 0 1 0 -96 0 48 48 0 1 0 96 0zm0 416a48 48 0 1 0 -96 0 48 48 0 1 0 96 0zM48 304a48 48 0 1 0 0-96 48 48 0 1 0 0 96zm464-48a48 48 0 1 0 -96 0 48 48 0 1 0 96 0zM142.9 437A48 48 0 1 0 75 369.1 48 48 0 1 0 142.9 437zm0-294.2A48 48 0 1 0 75 75a48 48 0 1 0 67.9 67.9zM369.1 437A48 48 0 1 0 437 369.1 48 48 0 1 0 369.1 437z"/>
+            </svg>
+          </span>
+          <p class="is-size-4 has-text-weight-bold">Loading...</p>
+        </div>
+      </div>
+    </div>
+    
+    
+    
+    <section class="section" id="classification-section">
+      <div class="content">
+        <h3 class="subtitle">Results</h3>
+        <p id="classification-attack-on-reputation">
+          The text contains the persuasion technique <strong>attack on reputation</strong><sup><a>[1]</a></sup>
+        </p>
+        <p id="classification-manipulative-wording">
+          The text contains the persuasion technique <strong>manipulative wording</strong><sup><a>[1]</a></sup>
+        </p>
+        <p id="classification-both">
+          The text contains the persuasion techniques <strong>attack on reputation</strong> <sup><a>[1]</a></sup> and <strong>manipulative wording</strong><sup><a>[2]</a></sup>
+        </p>
+        <p id="classification-none">
+          The text doesn´t contain any persuasion technique
+        </p>
+      </div>
+    </section>
+  </div>
+  <script src="script.js"></script>
+</body>
+</html>
