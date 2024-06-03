@@ -1,24 +1,37 @@
 {
-  "manifest_version": 2,
+  "manifest_version": 3,
   "name": "DIPO",
   "description": "Detect and classify persuasion techniques in text",
-  "version": "0.0.1",
+  "version": "0.0.3",
+  "host_permissions": [
+    "https://dipo.net.ar/*"
+  ],
+  "permissions": [
+    "activeTab"
+  ],
+  "content_security_policy": {
+    "extension_pages": "script-src 'self'; object-src 'self'; connect-src https://dipo.net.ar;"
+  },
   "icons": {
     "64": "icons/icon.png"
   },
-  "browser_action": {
-    "default_icon": {
-      "64": "icons/icon.png"
-    },
-    "default_popup": "browserAction/index.html",
-    "default_title": "DIPO",
-    "default_area": "navbar"
-  },
   "options_ui": {
-    "page": "options/index.html"
+    "page": "options/index.html",
+    "open_in_tab": true
   },
   "content_scripts": [{
     "matches": ["<all_urls>"],
-    "js": ["content-script.js"]
-}]
+    "js": ["content-script.js"],
+    "css": ["style.css"]
+  }],
+  "web_accessible_resources": [{
+    "resources": ["index.html"],
+    "matches": ["<all_urls>"]
+  }],
+  "browser_specific_settings": {
+  "gecko": {
+    "id": "detectorIntentosPersuasionOnline@dipo"
+  }
+}
+
 }
