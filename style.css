@@ -1,0 +1,11 @@
+.highlightAttackOnReputation {
+    background: red;
+  }
+
+.highlightManipulativeWording{
+  background: yellow;
+}
+
+.highlightAttackOnReputation.highlightManipulativeWording {
+  background: orange;
+}

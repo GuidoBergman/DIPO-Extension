@@ -3,6 +3,16 @@
   "name": "DIPO",
   "description": "Detect and classify persuasion techniques in text",
   "version": "0.0.1",
+  "permissions": [
+    "<all_urls>"
+  ],
+  "host_permissions": [
+    "<all_urls>"
+  ],
+  "content_security_policy": {
+    "extension_pages": "script-src 'self'; object-src 'self'",
+    "content_scripts": "script-src 'self' http://localhost:8000; connect-src https://localhost:8000"
+  },
   "icons": {
     "64": "icons/icon.png"
   },
@@ -19,6 +29,7 @@
   },
   "content_scripts": [{
     "matches": ["<all_urls>"],
-    "js": ["content-script.js"]
+    "js": ["content-script.js"],
+    "css": ["style.css"]
 }]
 }
