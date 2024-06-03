@@ -2381,9 +2381,11 @@ URL = "http://localhost:8000/classify"
 function highlightText(text, technique_name) {
   const content = document.documentElement.innerHTML
 
-  const regexSpaces = new RegExp(`\\s`, 'g');
-  text = text.replace(regexSpaces, '(<[^>]+>)* (<[^>]+>)*');
+  const regexNonAplha = new RegExp('[^a-z0-9áéíóúñü]', 'gi');
+  const replacer = (match) => `(<[^>]+>)*${match}(<[^>]+>)*`;
+  text = text.replace(regexNonAplha, replacer);
 
+  console.log(text);
 
   const regexText = new RegExp(`(${text})`, 'gi');
 
