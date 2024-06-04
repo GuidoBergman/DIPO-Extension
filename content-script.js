@@ -2425,13 +2425,17 @@ function classifyText(){
     var clonedDocument = document.cloneNode(true);
     var article = new Readability(clonedDocument).parse();
 
+
     hideClassification();
+    let body = {'text': article.textContent}
+    body = JSON.stringify(body);
     let headers = new Headers({
         'Accept': 'application/json',
-        'Content-Type': 'application/json'}
+        'Content-Type': 'application/json',
+        'Content-Length': body.length.toString()}
     );
-    let body = {'text': article.textContent}
-    let init = {method: 'POST', headers, body: JSON.stringify(body)};
+    
+    let init = {method: 'POST', headers, body: body};
     let request = new Request(URL, init);
     fetch(request).
       then(showClassificationFromResponse);
@@ -2448,5 +2452,31 @@ console.log(article.excerpt);
 console.log(article.textContent)
 
 classifyText();
+
+fetch(chrome.runtime.getURL('index.html'))
+  .then(response => response.text())
+  .then(html => {
+    var shadowHost = document.createElement('div');
+    shadowHost.style.cssText = 'position: fixed; top: 0; right: 0; z-index: 9999;';
+
+    var shadowRoot = shadowHost.attachShadow({ mode: 'open' });
+
+    var styleLink1 = document.createElement('link');
+    styleLink1.rel = 'stylesheet';
+    styleLink1.href = 'https://cdn.jsdelivr.net/npm/bulma@1.0.0/css/bulma.min.css';
+
+    var styleLink2 = document.createElement('link');
+    styleLink2.rel = 'stylesheet';
+    styleLink2.href = 'style.css';
+
+    var contentDiv = document.createElement('div');
+    contentDiv.innerHTML = html;
+
+    shadowRoot.appendChild(styleLink1);
+    shadowRoot.appendChild(styleLink2);
+    shadowRoot.appendChild(contentDiv);
+
+    document.body.appendChild(shadowHost);
+  });
 
 console.log('------------- END ------------------');

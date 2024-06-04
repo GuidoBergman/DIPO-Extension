@@ -31,5 +31,6 @@
     "matches": ["<all_urls>"],
     "js": ["content-script.js"],
     "css": ["style.css"]
-}]
+}],
+  "web_accessible_resources": ["index.html"]
 }
