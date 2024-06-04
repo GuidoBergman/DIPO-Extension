@@ -2465,16 +2465,18 @@ fetch(chrome.runtime.getURL('index.html'))
     styleLink1.rel = 'stylesheet';
     styleLink1.href = 'https://cdn.jsdelivr.net/npm/bulma@1.0.0/css/bulma.min.css';
 
-    var styleLink2 = document.createElement('link');
-    styleLink2.rel = 'stylesheet';
-    styleLink2.href = 'style.css';
+    var style = document.createElement('style');
+    style.textContent = `
+      @import 'https://cdn.jsdelivr.net/npm/bulma@1.0.0/css/bulma.min.css';
+      @import 'style.css';
+    `;
 
     var contentDiv = document.createElement('div');
     contentDiv.innerHTML = html;
 
-    shadowRoot.appendChild(styleLink1);
-    shadowRoot.appendChild(styleLink2);
+    shadowRoot.appendChild(style);
     shadowRoot.appendChild(contentDiv);
+    document.body.appendChild(shadowHost);
 
     document.body.appendChild(shadowHost);
   });
