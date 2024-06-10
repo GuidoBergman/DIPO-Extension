@@ -2407,6 +2407,22 @@ var cssStyles = `
 }
   `;
 
+  function allowDrop(ev) {
+    ev.preventDefault();
+  }
+  
+  function drag(ev) {
+    ev.dataTransfer.setData("text", ev.target.id);
+  }
+  
+  function drop(ev) {
+    ev.preventDefault();
+    var data = ev.dataTransfer.getData("text");
+    ev.target.appendChild(document.getElementById(data));
+  }
+
+  document.body.addEventListener('dragover', allowDrop, false);
+  document.body.addEventListener('drop', drop, false);
 
 
 function getModal(){
