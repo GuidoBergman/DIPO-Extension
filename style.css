@@ -1,20 +1,7 @@
 .highlightAttackOnReputation {
-    background: red;
+    background-color: rgba(255, 100, 100, 0.5);  
   }
-
-.highlightManipulativeWording{
-  background: yellow;
-}
-
-.highlightAttackOnReputation.highlightManipulativeWording {
-  background: orange;
-}
-
-@keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
-}
-
-#spinner-icon {
-  animation: spin 2s linear infinite;
-}
+  
+  .highlightManipulativeWording {
+    background-color: rgba(255, 165, 0, 0.5); 
+  }

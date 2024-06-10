@@ -2378,6 +2378,62 @@ if (typeof module === "object") {
 
 URL = "http://localhost:8000/classify"
 
+var cssStyles = `
+#modal{
+  background-color: #000000;
+  display: flex;
+  padding: 2px;
+  border-radius: 100px;
+  border: 5px solid #fff;
+  position = 'absolute';
+  top = '0px';
+  right = '0px';
+  z-index: 9999;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+#spinner-icon {
+  animation: spin 2s linear infinite;
+}
+
+.icon {
+  fill: rgba(255, 0, 0, 0.449); 
+  display: inline-block;
+  vertical-align: middle;
+}
+  `;
+
+
+
+function getModal(){
+  fetch(chrome.runtime.getURL('index.html'))
+  .then(response => response.text())
+  .then(html => {
+    var shadowHost = document.createElement('div');
+    shadowHost.style.cssText = 'position: fixed; top: 0; right: 0; z-index: 9999;';
+
+    var shadowRoot = shadowHost.attachShadow({ mode: 'open' });
+    
+
+    var styleLink2 = document.createElement('style');
+    styleLink2.rel = 'stylesheet';
+    styleLink2.appendChild(document.createTextNode(cssStyles));
+    styleLink2.type = 'text/css';
+
+    var contentDiv = document.createElement('div');
+    contentDiv.innerHTML = html;
+
+    shadowRoot.appendChild(styleLink2);
+    shadowRoot.appendChild(contentDiv);
+
+    document.body.appendChild(shadowHost);
+  });
+}
+
 function highlightText(text, technique_name) {
   const content = document.documentElement.innerHTML
 
@@ -2444,41 +2500,18 @@ function classifyText(){
 
 
 console.log('------------- START ------------------');
+
+getModal();
+
+
+//Borrame
 var clonedDocument = document.cloneNode(true);
 var article = new Readability(clonedDocument).parse();
-
 console.log(article.title);
 console.log(article.excerpt);
 console.log(article.textContent)
 
+console.log(article.content)
 classifyText();
-
-fetch(chrome.runtime.getURL('index.html'))
-  .then(response => response.text())
-  .then(html => {
-    var shadowHost = document.createElement('div');
-    shadowHost.style.cssText = 'position: fixed; top: 0; right: 0; z-index: 9999;';
-
-    var shadowRoot = shadowHost.attachShadow({ mode: 'open' });
-
-    var styleLink1 = document.createElement('link');
-    styleLink1.rel = 'stylesheet';
-    styleLink1.href = 'https://cdn.jsdelivr.net/npm/bulma@1.0.0/css/bulma.min.css';
-
-    var style = document.createElement('style');
-    style.textContent = `
-      @import 'https://cdn.jsdelivr.net/npm/bulma@1.0.0/css/bulma.min.css';
-      @import 'style.css';
-    `;
-
-    var contentDiv = document.createElement('div');
-    contentDiv.innerHTML = html;
-
-    shadowRoot.appendChild(style);
-    shadowRoot.appendChild(contentDiv);
-    document.body.appendChild(shadowHost);
-
-    document.body.appendChild(shadowHost);
-  });
 
 console.log('------------- END ------------------');
