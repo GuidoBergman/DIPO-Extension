@@ -2382,13 +2382,14 @@ var cssStyles = `
 #modal{
   background-color: #000000;
   display: flex;
-  padding: 2px;
+  padding: 5px;
   border-radius: 100px;
   border: 5px solid #fff;
   position = 'absolute';
   top = '0px';
   right = '0px';
   z-index: 9999;
+  width:  max-content;
 }
 
 @keyframes spin {
@@ -2401,15 +2402,41 @@ var cssStyles = `
 }
 
 .icon {
-  fill: rgba(255, 0, 0, 0.449); 
+  fill: rgba(255, 29, 29, 0.8);
   display: inline-block;
+  margin-left: 2px;
+  margin-right: 2px;
   vertical-align: middle;
+}
+
+#results-count {
+    height: 30px;
+    width: 35px;/*max(max-content, 300px);   */
+    font-size:      30px;
+	  font-weight:    bold;
+    color: white;
+    text-align: center;
+    line-height: 30px;
+    border-radius: 30px;
+    font-family: Arial, sans-serif;
+}
+
+.zero-count{
+background: linear-gradient(to top right, #00cc66 0%, #00ff00 100%);
+}
+
+.non-zero-count{
+background: linear-gradient(to top right, #cc3300 0%, #ff0000 100%);
+}
+
+.hidden{
+	display: none;
 }
   `;
 
 
 
-function getModal(){
+function getModal(isLoading, countTechniques){
   fetch(chrome.runtime.getURL('index.html'))
   .then(response => response.text())
   .then(html => {
@@ -2431,6 +2458,24 @@ function getModal(){
     shadowRoot.appendChild(contentDiv);
 
     document.body.appendChild(shadowHost);
+    modalElement = shadowRoot;
+
+    if (!isLoading){
+      let resultCount =  modalElement.getElementById('results-count');
+      console.log('Gona modify result: ' + resultCount + ' with modal: ' + modalElement);
+      resultCount.innerHTML = countTechniques;
+      if (countTechniques == 0){
+         resultCount.classList.remove('non-zero-count');
+         resultCount.classList.add('zero-count');
+      } else{
+        resultCount.classList.add('non-zero-count');
+        resultCount.classList.remove('zero-count');
+      }
+      
+      modalElement.getElementById('spinner-icon').classList.add('hidden');
+      resultCount.classList.remove('hidden');
+    }
+
   });
 }
 
@@ -2440,8 +2485,6 @@ function highlightText(text, technique_name) {
   const regexNonAplha = new RegExp('[^a-z0-9áéíóúñü]', 'gi');
   const replacer = (match) => `(<[^>]+>)*${match}(<[^>]+>)*`;
   text = text.replace(regexNonAplha, replacer);
-
-  console.log(text);
 
   const regexText = new RegExp(`(${text})`, 'gi');
 
@@ -2457,6 +2500,7 @@ function highlightText(text, technique_name) {
 function showClassificationFromResponse(response){   
     response.json().then(json => {
         console.log(json);
+        let countTechniques = 0;
         let technique_names = Object.keys(json);
         for (var i = 0; i < technique_names.length; i++) {
            let technique_name = String(technique_names[i]);
@@ -2465,24 +2509,24 @@ function showClassificationFromResponse(response){
            console.log(techniques);
            for (var j = 0; j < techniques.length; j++) {
               highlightText(techniques[j], technique_name);
+			  countTechniques += 1; 
            }
+           
          }
+        console.log('Gona get modal');
+        getModal(false, countTechniques);
+	console.log('End show');
     });
 
     
 }
 
 
-function hideClassification(){
-}
-
 function classifyText(){
-    console.log('Classify text');
     var clonedDocument = document.cloneNode(true);
     var article = new Readability(clonedDocument).parse();
 
 
-    hideClassification();
     let body = {'text': article.textContent}
     body = JSON.stringify(body);
     let headers = new Headers({
@@ -2490,7 +2534,6 @@ function classifyText(){
         'Content-Type': 'application/json',
         'Content-Length': body.length.toString()}
     );
-    
     let init = {method: 'POST', headers, body: body};
     let request = new Request(URL, init);
     fetch(request).
@@ -2501,7 +2544,8 @@ function classifyText(){
 
 console.log('------------- START ------------------');
 
-getModal();
+var modalElement;
+getModal(true, 0);
 
 
 //Borrame
@@ -2513,5 +2557,8 @@ console.log(article.textContent)
 
 console.log(article.content)
 classifyText();
+
+
+
 
 console.log('------------- END ------------------');
