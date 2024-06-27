@@ -2523,8 +2523,11 @@ function showClassificationFromResponse(response){
 
 
 function classifyText(){
+    let classes = addIdClasses();
+    let options = {classesToPreserve: classes}; 
     var clonedDocument = document.cloneNode(true);
-    var article = new Readability(clonedDocument).parse();
+    var article = new Readability(clonedDocument, options).parse();
+    console.log(article.content)
 
 
     let body = {'text': article.textContent}
@@ -2540,25 +2543,23 @@ function classifyText(){
       then(showClassificationFromResponse);
 }
 
+function addIdClasses(){
+  var elements = document.getElementsByTagName("*");
+  let classes = Array();
+
+  for (var i=0, max=elements.length; i < max; i++) {
+       id = 'element-id-'+i;
+       classes.push(id);
+       elements[i].classList.add(id)
+  }
+  return classes;
+}
 
 
 console.log('------------- START ------------------');
 
 var modalElement;
 getModal(true, 0);
-
-
-//Borrame
-var clonedDocument = document.cloneNode(true);
-var article = new Readability(clonedDocument).parse();
-console.log(article.title);
-console.log(article.excerpt);
-console.log(article.textContent)
-
-console.log(article.content)
 classifyText();
-
-
-
 
 console.log('------------- END ------------------');
