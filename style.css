@@ -5,3 +5,37 @@
   .highlightManipulativeWording {
     background-color: rgba(255, 165, 0, 0.5); 
   }
+
+  
+.explanation {
+  font-style: italic;
+  color: #555;
+  margin-left: 5px;
+  font-weight:normal;
+}
+
+.info-box {
+  position: absolute;
+  background: #fff;
+  border-radius: 5px;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+  z-index: 1000;
+
+  border: 2px solid #ddd;
+  border-radius: 8px;
+  padding: 20px;
+  max-width: 400px;
+  min-width: 400px;
+  margin: 20px auto;
+}
+
+.hidden { display: none; }
+
+
+.close-link {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  width: 30px;
+  height: 30px;
+}

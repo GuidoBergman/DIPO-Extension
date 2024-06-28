@@ -2378,6 +2378,16 @@ if (typeof module === "object") {
 
 URL = "http://localhost:8000/classify"
 
+const techniqueNamesDic = {
+  'ManipulativeWording': 'Manipulative wording',
+  'AttackOnReputation': 'Attack on reputation'
+}
+
+const techniqueDescriptionDic = {
+  'ManipulativeWording': 'The text is not an argument per se, but uses specific language, which contains words or phrases that are either non-neutral, confusing, exaggerating, loaded, etc., in order to impact the reader emotionally.',
+  'AttackOnReputation': 'The argument does not address the topic, but rather targets the participant (personality, experience, deeds) in order to question and/or to undermine their credibility. The object of the argumentation can also refer to a group of individuals, an organization, an object, or an activity.'
+}
+
 var cssStyles = `
 #modal{
   background-color: #000000;
@@ -2479,7 +2489,7 @@ function getModal(isLoading, countTechniques){
   });
 }
 
-function highlightText(text, technique_name) {
+function highlightText(text, techniqueName) {
   const content = document.documentElement.innerHTML
 
   const regexNonAplha = new RegExp('[^a-z0-9áéíóúñü]', 'gi');
@@ -2488,7 +2498,19 @@ function highlightText(text, technique_name) {
 
   const regexText = new RegExp(`(${text})`, 'gi');
 
-  const highlightedContent = content.replace(regexText, `<span class="highlight${technique_name}">$1</span>`);
+  const explanationId = getNextId(techniqueName)
+  const highlightedContent = content.replace(regexText, `
+    <span class="highlight${techniqueName}">
+      $1
+      <span class="explanation">
+        <a href="#" class="info-link" data-target="${explanationId}">(${techniqueNamesDic[techniqueName]})</a>
+        <span id="${explanationId}" class="info-box hidden">
+          ${techniqueDescriptionDic[techniqueName]}
+          <a href="#" class="close-link">X</a>
+        </span>
+      </span>
+    
+    </span>`);
 
 
   document.documentElement.innerHTML = highlightedContent;  
@@ -2540,6 +2562,26 @@ function classifyText(){
       then(showClassificationFromResponse);
 }
 
+function showExplanation(e){
+  if (e.target.classList.contains('info-link')) {
+    e.preventDefault();
+    const targetId = e.target.dataset.target;
+    const infoBox = document.getElementById(targetId);
+    infoBox.classList.toggle('hidden');
+  } else if (e.target.classList.contains('close-link')) {
+    e.preventDefault();
+    e.target.closest('.info-box').classList.add('hidden');
+  }
+}
+
+
+
+function getNextId(technique) {
+  const existingIds = Array.from(document.querySelectorAll(`.info-box[id^="${technique}-"]`))
+    .map(el => parseInt(el.id.split('-')[1]));
+  const maxId = Math.max(...existingIds, 0);
+  return `${technique}-${maxId + 1}`;
+}
 
 
 console.log('------------- START ------------------');
@@ -2557,6 +2599,10 @@ console.log(article.textContent)
 
 console.log(article.content)
 classifyText();
+
+document.addEventListener('click', function(e) {
+  showExplanation(e)
+});
 
 
 
