@@ -2567,6 +2567,11 @@ function showExplanation(e){
     e.preventDefault();
     const targetId = e.target.dataset.target;
     const infoBox = document.getElementById(targetId);
+
+    const infoBoxes = document.querySelectorAll(`.info-box:not(#${targetId})`);
+    for (var i = 0; i < infoBoxes.length; i++) {  
+      infoBoxes[i].classList.add('hidden');
+    }
     infoBox.classList.toggle('hidden');
   } else if (e.target.classList.contains('close-link')) {
     e.preventDefault();
