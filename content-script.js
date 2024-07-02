@@ -2548,8 +2548,9 @@ function classifyText(){
     var clonedDocument = document.cloneNode(true);
     var article = new Readability(clonedDocument).parse();
 
+    var text = article.title + '.' + article.excerpt + '.' + article.textContent
 
-    let body = {'text': article.textContent}
+    let body = {'text': text}
     body = JSON.stringify(body);
     let headers = new Headers({
         'Accept': 'application/json',
