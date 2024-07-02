@@ -23,7 +23,7 @@
 
   border: 2px solid #ddd;
   border-radius: 8px;
-  padding: 20px;
+  padding: 25px;
   max-width: 400px;
   min-width: 400px;
   margin: 20px auto;
@@ -34,8 +34,9 @@
 
 .close-link {
   position: absolute;
-  top: 10px;
-  right: 10px;
+  top: 5px;
+  right: 5px;
   width: 30px;
   height: 30px;
+  font-style: normal;
 }

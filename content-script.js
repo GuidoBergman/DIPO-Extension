@@ -2505,6 +2505,7 @@ function highlightText(text, techniqueName) {
       <span class="explanation">
         <a href="#" class="info-link" data-target="${explanationId}">(${techniqueNamesDic[techniqueName]})</a>
         <span id="${explanationId}" class="info-box hidden">
+          <strong>${techniqueNamesDic[techniqueName]}: </strong>
           ${techniqueDescriptionDic[techniqueName]}
           <a href="#" class="close-link">X</a>
         </span>
@@ -2544,11 +2545,14 @@ function showClassificationFromResponse(response){
 }
 
 
+
 function classifyText(){
     var clonedDocument = document.cloneNode(true);
     var article = new Readability(clonedDocument).parse();
+    console.log(article.content)
 
-    var text = article.title + '.' + article.excerpt + '.' + article.textContent
+    var text = article.title + '.' + article.excerpt + '.' + article.textContent;
+    console.log(text)
 
     let body = {'text': text}
     body = JSON.stringify(body);
@@ -2596,14 +2600,6 @@ var modalElement;
 getModal(true, 0);
 
 
-//Borrame
-var clonedDocument = document.cloneNode(true);
-var article = new Readability(clonedDocument).parse();
-console.log(article.title);
-console.log(article.excerpt);
-console.log(article.textContent)
-
-console.log(article.content)
 classifyText();
 
 document.addEventListener('click', function(e) {
