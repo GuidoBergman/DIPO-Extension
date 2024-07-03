@@ -2521,13 +2521,33 @@ function showClassificationFromResponse(response){
     
 }
 
+function getParagrhpsDic(articleDocument, readability){
+  let paragraphs = {}
+
+  console.log('Get paragraphs')
+
+  let paragraphList = articleDocument.getElementById('readability-page-1').firstChild.children;
+  for (var i=0, max=paragraphList.length; i < max; i++) {
+      console.log(readability._getInnerText(paragraphList[i]));
+  }
+
+  return paragraphs
+
+}
+
 
 function classifyText(){
     let classes = addIdClasses();
     let options = {classesToPreserve: classes}; 
     var clonedDocument = document.cloneNode(true);
-    var article = new Readability(clonedDocument, options).parse();
+    var readability = new Readability(clonedDocument, options);
+    var article = readability.parse();
     console.log(article.content)
+    const parser = new DOMParser();
+    const articleDocument = parser.parseFromString(article.content, 'text/html');
+    paragraphs = getParagrhpsDic(articleDocument, readability);
+    console.log(paragraphs)
+
 
 
     let body = {'text': article.textContent}
