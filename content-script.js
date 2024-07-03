@@ -2421,7 +2421,7 @@ var cssStyles = `
 
 #results-count {
     height: 30px;
-    width: 35px;/*max(max-content, 300px);   */
+    width: 35px;
     font-size:      30px;
 	  font-weight:    bold;
     color: white;
