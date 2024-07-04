@@ -2398,7 +2398,7 @@ var cssStyles = `
   position = 'absolute';
   top = '0px';
   right = '0px';
-  z-index: 9999;
+  z-index: 2147483647;
   width:  max-content;
 }
 
@@ -2490,7 +2490,7 @@ function getModal(isLoading, countTechniques){
 }
 
 function highlightText(text, techniqueName) {
-  const content = document.documentElement.innerHTML
+  const content = document.body.innerHTML;
 
   const regexNonAplha = new RegExp('[^a-z0-9áéíóúñü]', 'gi');
   const replacer = (match) => `(<[^>]+>)*${match}(<[^>]+>)*`;
@@ -2514,7 +2514,7 @@ function highlightText(text, techniqueName) {
     </span>`);
 
 
-  document.documentElement.innerHTML = highlightedContent;  
+    document.body.innerHTML = highlightedContent;  
 }
 
 
