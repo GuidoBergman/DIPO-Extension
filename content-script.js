@@ -2506,12 +2506,6 @@ function adpatTextToRegex(text){
 function highlightText(text, techniqueName) {
   const content = document.body.innerHTML;
 
-            // Borrame
-            if (text == 'La parte más celebrada de la noche fue cuando al cierre de una declaración sobre inmigrantes Biden pareció balbucear (fue tartamudo durante su niñez) y hablar algo más despacio, a pesar de que se entendió que se refería a patrullas fronterizas y oficinas de asilo'){
-              console.log(adpatTextToRegex(text));
-              console.log(  new RegExp(`<span class="highlight[^>]+">\n.*${adpatTextToRegex(text)}\\s*<span class="explanation">\\s*.`, 'gi'));
-            }
-
   text = adpatTextToRegex(text);
   const regexText = new RegExp(text,'gi');
   const regexHighlight =  new RegExp(`<span class="highlight[^>]+">\n.*${text}\\s*<span class="explanation">\\s*.`, 'gi');
@@ -2522,12 +2516,8 @@ function highlightText(text, techniqueName) {
   
   let highlightedContent;
   if (regexHighlight.test(content)){
-      console.log('Ya estaba subrayado');
 
       let textHTML = content.match(regexText)[0];
-      console.log(textHTML);
-
-      console.log(content);
 
       highlightedContent = content.replace(regexHighlight, `
         <span class="highlightBoth">
