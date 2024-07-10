@@ -43,3 +43,7 @@
   height: 30px;
   font-style: normal;
 }
+
+.info-link{
+  text-decoration: underline;
+}
