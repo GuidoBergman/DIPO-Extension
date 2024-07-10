@@ -2489,30 +2489,71 @@ function getModal(isLoading, countTechniques){
   });
 }
 
+function adpatTextToRegex(text){
+
+  regexEsc = new RegExp('[.*+?^${}()|[\\]\\\\]', 'g');
+  const replacerEsc = (match) => '\\' + match;
+  text = text.replace(regexEsc, replacerEsc);
+
+  const regexNonAlpha = new RegExp('(?:\\\\.|[^a-z0-9áéíóúñü])', 'gi');
+  const replacer = (match) => `(<[^>]+>)*${match}(<[^>]+>)*`;
+  text = text.replace(regexNonAlpha, replacer);
+
+  const regexText = `(${text})`;
+  return regexText;
+}
+
 function highlightText(text, techniqueName) {
   const content = document.body.innerHTML;
 
-  const regexNonAplha = new RegExp('[^a-z0-9áéíóúñü]', 'gi');
-  const replacer = (match) => `(<[^>]+>)*${match}(<[^>]+>)*`;
-  text = text.replace(regexNonAplha, replacer);
+            // Borrame
+            if (text == 'La parte más celebrada de la noche fue cuando al cierre de una declaración sobre inmigrantes Biden pareció balbucear (fue tartamudo durante su niñez) y hablar algo más despacio, a pesar de que se entendió que se refería a patrullas fronterizas y oficinas de asilo'){
+              console.log(adpatTextToRegex(text));
+              console.log(  new RegExp(`<span class="highlight[^>]+">\n.*${adpatTextToRegex(text)}\\s*<span class="explanation">\\s*.`, 'gi'));
+            }
 
-  const regexText = new RegExp(`(${text})`, 'gi');
+  text = adpatTextToRegex(text);
+  const regexText = new RegExp(text,'gi');
+  const regexHighlight =  new RegExp(`<span class="highlight[^>]+">\n.*${text}\\s*<span class="explanation">\\s*.`, 'gi');
 
-  const explanationId = getNextId(techniqueName)
-  const highlightedContent = content.replace(regexText, `
-    <span class="highlight${techniqueName}">
-      $1
-      <span class="explanation">
-        <a href="#" class="info-link" data-target="${explanationId}">(${techniqueNamesDic[techniqueName]})</a>
-        <span id="${explanationId}" class="info-box hidden">
-          <strong>${techniqueNamesDic[techniqueName]}: </strong>
-          ${techniqueDescriptionDic[techniqueName]}
-          <a href="#" class="close-link">X</a>
-        </span>
-      </span>
-    
-    </span>`);
 
+
+  const explanationId = getNextId(techniqueName);
+  
+  let highlightedContent;
+  if (regexHighlight.test(content)){
+      console.log('Ya estaba subrayado');
+
+      let textHTML = content.match(regexText)[0];
+      console.log(textHTML);
+
+      console.log(content);
+
+      highlightedContent = content.replace(regexHighlight, `
+        <span class="highlightBoth">
+          ${textHTML}
+          <span class="explanation">
+            (<a href="#" class="info-link" data-target="${explanationId}">${techniqueNamesDic[techniqueName]}</a> and 
+            <span id="${explanationId}" class="info-box hidden">
+              <strong>${techniqueNamesDic[techniqueName]}: </strong>
+              ${techniqueDescriptionDic[techniqueName]}
+              <a href="#" class="close-link">X</a>
+            </span>`);
+  } else{
+
+    highlightedContent = content.replace(regexText, `
+      <span class="highlight${techniqueName}">
+        $1
+        <span class="explanation">
+          (<a href="#" class="info-link" data-target="${explanationId}">${techniqueNamesDic[techniqueName]}</a>)
+          <span id="${explanationId}" class="info-box hidden">
+            <strong>${techniqueNamesDic[techniqueName]}: </strong>
+            ${techniqueDescriptionDic[techniqueName]}
+            <a href="#" class="close-link">X</a>
+          </span>
+        </span>    
+      </span>`);
+  }
 
     document.body.innerHTML = highlightedContent;  
 }
@@ -2522,7 +2563,6 @@ function highlightText(text, techniqueName) {
 
 function showClassificationFromResponse(response){   
     response.json().then(json => {
-        console.log(json);
         let countTechniques = 0;
         let technique_names = Object.keys(json);
         for (var i = 0; i < technique_names.length; i++) {
@@ -2532,7 +2572,7 @@ function showClassificationFromResponse(response){
            console.log(techniques);
            for (var j = 0; j < techniques.length; j++) {
               highlightText(techniques[j], technique_name);
-			  countTechniques += 1; 
+			        countTechniques += 1; 
            }
            
          }
