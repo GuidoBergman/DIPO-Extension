@@ -2566,9 +2566,7 @@ function showClassificationFromResponse(response){
            }
            
          }
-        console.log('Gona get modal');
         getModal(false, countTechniques);
-	console.log('End show');
     });
 
     
