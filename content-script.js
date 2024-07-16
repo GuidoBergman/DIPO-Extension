@@ -2516,7 +2516,7 @@ function highlightText(text, techniqueName) {
   
   let highlightedContent;
   if (regexHighlight.test(content)){
-
+/*
       let textHTML = content.match(regexText)[0];
 
       highlightedContent = content.replace(regexHighlight, `
@@ -2528,21 +2528,30 @@ function highlightText(text, techniqueName) {
               <strong>${techniqueNamesDic[techniqueName]}: </strong>
               ${techniqueDescriptionDic[techniqueName]}
               <a href="#" class="close-link">X</a>
-            </span>`);
+            </span>`); */
+            highlightedContent = content;
   } else{
+    //let regexHeading =  new RegExp('<h([1-9]).*?>.*?' + text + '.*?<\/h([1-9])>', 'i');
+    // borrame
+    if (techniqueName == 'ManipulativeWording'){
+      return;
+    }
 
-    highlightedContent = content.replace(regexText, `
-      <span class="highlight${techniqueName}">
-        $1
-        <span class="explanation">
+    let regexHeading =  new RegExp('<h1.*?>.*?' + text + '.*?<\/h1>', 'gi');
+    console.log(regexHeading);
+	
+    highlightedContent = content.replace(regexHeading, 
+      `<span class="highlight${techniqueName}">
+        $&   
+      </span>
+      <span class="explanation">
           (<a href="#" class="info-link" data-target="${explanationId}">${techniqueNamesDic[techniqueName]}</a>)
           <span id="${explanationId}" class="info-box hidden">
             <strong>${techniqueNamesDic[techniqueName]}: </strong>
             ${techniqueDescriptionDic[techniqueName]}
             <a href="#" class="close-link">X</a>
           </span>
-        </span>    
-      </span>`);
+        </span> `);
   }
 
     document.body.innerHTML = highlightedContent;  
