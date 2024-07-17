@@ -2489,6 +2489,16 @@ function getModal(isLoading, countTechniques){
   });
 }
 
+
+function markElementsWithContentModelRestrictions(){
+ var elements = document.querySelectorAll("h1, h2, h3, h4, h5, h6")
+
+  for (var i=0, max=elements.length; i < max; i++) {
+       elements[i].classList.add('restricted-element')
+  }
+}
+
+
 function adpatTextToRegex(text){
 
   regexEsc = new RegExp('[.*+?^${}()|[\\]\\\\]', 'g');
@@ -2503,17 +2513,66 @@ function adpatTextToRegex(text){
   return regexText;
 }
 
+function getExplanationStr(techniqueName){
+ const explanationId = getNextId(techniqueName);
+
+ return `<span class="explanation">
+          (<a href="#" class="info-link" data-target="${explanationId}">${techniqueNamesDic[techniqueName]}</a>)
+          <span id="${explanationId}" class="info-box hidden">
+            <strong>${techniqueNamesDic[techniqueName]}: </strong>
+            ${techniqueDescriptionDic[techniqueName]}
+            <a href="#" class="close-link">X</a>
+          </span>
+        </span>    
+      </span>`;
+}
+
+function highlightRestrictedElements(text, techniqueName){
+  var elements = document.getElementsByClassName("restricted-element");
+  for (var i=0, max=elements.length; i < max; i++) {
+   var element = elements[i];
+   if (element.textContent.includes(text)){
+     element.classList.add('highlight' + techniqueName);
+
+     let tempContainer = document.createElement('div');
+     tempContainer.innerHTML = getExplanationStr(techniqueName);
+     let explanation = tempContainer.firstElementChild;
+
+
+     // Copy css
+     const styles = window.getComputedStyle(element);
+     let cssText = styles.cssText;
+     if (!cssText) {
+       cssText = Array.from(styles).reduce((str, property) => {
+       return `${str}${property}:${styles.getPropertyValue(
+       property,
+       )};`;
+       }, '');
+     }
+     explanation.style.cssText = cssText;
+     console.error(cssText);
+
+     element.insertAdjacentElement("afterend", explanation);
+
+     return 'OK';
+   }
+  }
+  
+  return 'Err';
+}
+
 function highlightText(text, techniqueName) {
+  if (highlightRestrictedElements(text, techniqueName) == 'OK'){
+    return;
+  }
+
+
   const content = document.body.innerHTML;
 
   text = adpatTextToRegex(text);
   const regexText = new RegExp(text,'gi');
   const regexHighlight =  new RegExp(`<span class="highlight[^>]+">\n.*${text}\\s*<span class="explanation">\\s*.`, 'gi');
 
-
-
-  const explanationId = getNextId(techniqueName);
-  
   let highlightedContent;
   if (regexHighlight.test(content)){
 
@@ -2531,18 +2590,12 @@ function highlightText(text, techniqueName) {
             </span>`);
   } else{
 
-    highlightedContent = content.replace(regexText, `
-      <span class="highlight${techniqueName}">
-        $1
-        <span class="explanation">
-          (<a href="#" class="info-link" data-target="${explanationId}">${techniqueNamesDic[techniqueName]}</a>)
-          <span id="${explanationId}" class="info-box hidden">
-            <strong>${techniqueNamesDic[techniqueName]}: </strong>
-            ${techniqueDescriptionDic[techniqueName]}
-            <a href="#" class="close-link">X</a>
-          </span>
-        </span>    
-      </span>`);
+    highlightedContent = content.replace(regexText,
+     `<span class="highlight${techniqueName}">
+         $1
+         ${getExplanationStr(techniqueName)}
+     </span>`
+     );
   }
 
     document.body.innerHTML = highlightedContent;  
@@ -2626,7 +2679,7 @@ console.log('------------- START ------------------');
 
 var modalElement;
 getModal(true, 0);
-
+markElementsWithContentModelRestrictions();
 
 classifyText();
 
