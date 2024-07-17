@@ -2539,18 +2539,9 @@ function highlightRestrictedElements(text, techniqueName){
      let explanation = tempContainer.firstElementChild;
 
 
-     // Copy css
+     // Copy font-size
      const styles = window.getComputedStyle(element);
-     let cssText = styles.cssText;
-     if (!cssText) {
-       cssText = Array.from(styles).reduce((str, property) => {
-       return `${str}${property}:${styles.getPropertyValue(
-       property,
-       )};`;
-       }, '');
-     }
-     explanation.style.cssText = cssText;
-     console.error(cssText);
+     explanation.style['font-size'] = styles['font-size']; 
 
      element.insertAdjacentElement("afterend", explanation);
 
