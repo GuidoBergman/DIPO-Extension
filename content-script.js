@@ -2499,7 +2499,7 @@ function markElementsWithContentModelRestrictions(){
 }
 
 
-function adpatTextToRegex(text){
+function adaptTextToRegex(text){
 
   regexEsc = new RegExp('[.*+?^${}()|[\\]\\\\]', 'g');
   const replacerEsc = (match) => '\\' + match;
@@ -2508,6 +2508,14 @@ function adpatTextToRegex(text){
   const regexNonAlpha = new RegExp('(?:\\\\.|[^a-z0-9áéíóúñü])', 'gi');
   const replacer = (match) => `(<[^>]+>)*${match}(<[^>]+>)*`;
   text = text.replace(regexNonAlpha, replacer);
+
+  if (text.substring(0,10) == '(<[^>]+>)*'){
+    text = text.substring(10,text.length);
+  }
+  if (text.substring(text.length-10) == '(<[^>]+>)*'){
+    text = text.substring(0,text.length-10);
+  }
+ 
 
   const regexText = `(${text})`;
   return regexText;
@@ -2582,7 +2590,7 @@ function highlightText(text, techniqueName) {
 
   const content = document.body.innerHTML;
 
-  text = adpatTextToRegex(text);
+  text = adaptTextToRegex(text);
   const regexText = new RegExp(text,'gi');
   const regexHighlight =  new RegExp(`<span class="highlight[^>]+">\n.*${text}\\s*<span class="explanation">\\s*.`, 'gi');
 
