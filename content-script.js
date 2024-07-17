@@ -2569,6 +2569,8 @@ function highlightText(text, techniqueName) {
 
       let textHTML = content.match(regexText)[0];
 
+      const explanationId = getNextId(techniqueName);
+
       highlightedContent = content.replace(regexHighlight, `
         <span class="highlightBoth">
           ${textHTML}
