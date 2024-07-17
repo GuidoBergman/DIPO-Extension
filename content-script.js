@@ -2513,11 +2513,15 @@ function adpatTextToRegex(text){
   return regexText;
 }
 
-function getExplanationStr(techniqueName){
+function getExplanationStr(techniqueName, addFirstParenthesis=true){
  const explanationId = getNextId(techniqueName);
+ let firstParenthesis = '(';
+ if (!addFirstParenthesis){
+   firstParenthesis = '';
+ }
 
  return `<span class="explanation">
-          (<a href="#" class="info-link" data-target="${explanationId}">${techniqueNamesDic[techniqueName]}</a>)
+          ${firstParenthesis}<a href="#" class="info-link" data-target="${explanationId}">${techniqueNamesDic[techniqueName]}</a>)
           <span id="${explanationId}" class="info-box hidden">
             <strong>${techniqueNamesDic[techniqueName]}: </strong>
             ${techniqueDescriptionDic[techniqueName]}
@@ -2532,12 +2536,30 @@ function highlightRestrictedElements(text, techniqueName){
   for (var i=0, max=elements.length; i < max; i++) {
    var element = elements[i];
    if (element.textContent.includes(text)){
+    for (var i=0, max=element.classList.length; i < max; i++) {
+      if (element.classList[i].includes('highlight')){
+        element.classList.remove(element.classList[i]);
+        element.classList.add('highlightBoth')
+
+        let explanation = element.nextElementSibling;
+        explanation.classList.remove(element.classList[i]);
+        explanation.classList.add('highlightBoth')
+
+        explanation.firstChild.nextElementSibling.nextSibling.nodeValue = ' and ';
+        explanation.firstChild.nextElementSibling.nextElementSibling.insertAdjacentHTML("beforebegin", getExplanationStr(techniqueName, false)) 
+
+
+
+        return 'OK';
+      }
+    }
+   
      element.classList.add('highlight' + techniqueName);
 
      let tempContainer = document.createElement('div');
      tempContainer.innerHTML = getExplanationStr(techniqueName);
      let explanation = tempContainer.firstElementChild;
-
+     explanation.classList.add('highlight' + techniqueName);
 
      // Copy font-size
      const styles = window.getComputedStyle(element);
@@ -2549,7 +2571,7 @@ function highlightRestrictedElements(text, techniqueName){
    }
   }
   
-  return 'Err';
+  return 'ERR';
 }
 
 function highlightText(text, techniqueName) {
@@ -2571,8 +2593,8 @@ function highlightText(text, techniqueName) {
 
       const explanationId = getNextId(techniqueName);
 
-      highlightedContent = content.replace(regexHighlight, `
-        <span class="highlightBoth">
+      highlightedContent = content.replace(regexHighlight, 
+       `<span class="highlightBoth">
           ${textHTML}
           <span class="explanation">
             (<a href="#" class="info-link" data-target="${explanationId}">${techniqueNamesDic[techniqueName]}</a> and 
