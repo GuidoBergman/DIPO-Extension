@@ -2472,7 +2472,6 @@ function getModal(isLoading, countTechniques){
 
     if (!isLoading){
       let resultCount =  modalElement.getElementById('results-count');
-      console.log('Gona modify result: ' + resultCount + ' with modal: ' + modalElement);
       resultCount.innerHTML = countTechniques;
       if (countTechniques == 0){
          resultCount.classList.remove('non-zero-count');
@@ -2539,44 +2538,38 @@ function getExplanationStr(techniqueName, addFirstParenthesis=true){
       </span>`;
 }
 
-function highlightRestrictedElements(text, techniqueName){
+function highlightRestrictedElements(text, techniqueName) {
   var elements = document.getElementsByClassName("restricted-element");
-  for (var i=0, max=elements.length; i < max; i++) {
-   var element = elements[i];
-   if (element.textContent.includes(text)){
-    for (var i=0, max=element.classList.length; i < max; i++) {
-      if (element.classList[i].includes('highlight')){
-        element.classList.remove(element.classList[i]);
-        element.classList.add('highlightBoth')
+  for (var i = 0; i < elements.length; i++) {
+    var element = elements[i];
+    if (element.textContent.includes(text)) {
+      for (var j = 0; j < element.classList.length; j++) {
+        if (element.classList[j].includes('highlight')) {
+          element.classList.remove(element.classList[j]);
+          element.classList.add('highlightBoth');
 
-        let explanation = element.nextElementSibling;
-        explanation.classList.remove(element.classList[i]);
-        explanation.classList.add('highlightBoth')
+          let explanation = element.nextElementSibling;
+          explanation.classList.remove(element.classList[j]);
+          explanation.classList.add('highlightBoth');
 
-        explanation.firstChild.nextElementSibling.nextSibling.nodeValue = ' and ';
-        explanation.firstChild.nextElementSibling.nextElementSibling.insertAdjacentHTML("beforebegin", getExplanationStr(techniqueName, false)) 
-
-
-
-        return 'OK';
+          explanation.firstChild.nextElementSibling.nextSibling.nodeValue = ' and ';
+          explanation.firstChild.nextElementSibling.nextElementSibling.insertAdjacentHTML("beforebegin", getExplanationStr(techniqueName, false));
+          return 'OK';
+        }
       }
+      
+      element.classList.add('highlight' + techniqueName);
+
+      let tempContainer = document.createElement('div');
+      tempContainer.innerHTML = getExplanationStr(techniqueName);
+      let explanation = tempContainer.firstElementChild;
+      explanation.classList.add('highlight' + techniqueName);
+
+      const styles = window.getComputedStyle(element);
+      explanation.style['font-size'] = styles['font-size']; 
+      element.insertAdjacentElement("afterend", explanation);
+      return 'OK';
     }
-   
-     element.classList.add('highlight' + techniqueName);
-
-     let tempContainer = document.createElement('div');
-     tempContainer.innerHTML = getExplanationStr(techniqueName);
-     let explanation = tempContainer.firstElementChild;
-     explanation.classList.add('highlight' + techniqueName);
-
-     // Copy font-size
-     const styles = window.getComputedStyle(element);
-     explanation.style['font-size'] = styles['font-size']; 
-
-     element.insertAdjacentElement("afterend", explanation);
-
-     return 'OK';
-   }
   }
   
   return 'ERR';
