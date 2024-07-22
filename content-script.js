@@ -2377,6 +2377,7 @@ if (typeof module === "object") {
 
 
 URL = "http://localhost:8000/classify"
+//URL = "http://34.72.70.167:8000/classify"
 
 const techniqueNamesDic = {
   'ManipulativeWording': 'Manipulative wording',
