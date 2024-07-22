@@ -2653,9 +2653,14 @@ function showClassificationFromResponse(response){
 function classifyText(){
     var clonedDocument = document.cloneNode(true);
     var article = new Readability(clonedDocument).parse();
-    console.log(article.content)
 
-    var text = article.title + '.' + article.excerpt + '.' + article.textContent;
+    var text;
+
+    if (article.title != article.excerpt){
+      text = article.title + '.' + article.excerpt + '.' + article.textContent;
+    } else{
+      text = article.title + '.' + article.textContent;
+    }
     console.log(text)
 
     let body = {'text': text}
