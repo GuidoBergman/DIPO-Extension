@@ -2516,6 +2516,8 @@ function adaptTextToRegex(text){
     text = text.substring(0,text.length-10);
   }
 
+  text = '(<(strong|b)>)?' + text + '(<\/(strong|b)>)?';
+
   negativLoookbehindStart = `(?<!restricted-element`
   negativLoookbehindEnd = `">)`
   text = negativLoookbehindStart +  negativLoookbehindEnd + text;
