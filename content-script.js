@@ -2372,6 +2372,95 @@ if (typeof module === "object") {
   module.exports = Readability;
 }
 
+
+var REGEXPS = {
+  // NOTE: These two regular expressions are duplicated in
+  // Readability.js. Please keep both copies in sync.
+  unlikelyCandidates:
+    /-ad-|ai2html|banner|breadcrumbs|combx|comment|community|cover-wrap|disqus|extra|footer|gdpr|header|legends|menu|related|remark|replies|rss|shoutbox|sidebar|skyscraper|social|sponsor|supplemental|ad-break|agegate|pagination|pager|popup|yom-remote/i,
+  okMaybeItsACandidate: /and|article|body|column|content|main|shadow/i,
+};
+
+function isNodeVisible(node) {
+  // Have to null-check node.style and node.className.includes to deal with SVG and MathML nodes.
+  return (
+    (!node.style || node.style.display != "none") &&
+    !node.hasAttribute("hidden") &&
+    //check for "fallback-image" so that wikimedia math images are displayed
+    (!node.hasAttribute("aria-hidden") ||
+      node.getAttribute("aria-hidden") != "true" ||
+      (node.className &&
+        node.className.includes &&
+        node.className.includes("fallback-image")))
+  );
+}
+
+function isProbablyReaderable(doc, options = {}) {
+  // For backward compatibility reasons 'options' can either be a configuration object or the function used
+  // to determine if a node is visible.
+  if (typeof options == "function") {
+    options = { visibilityChecker: options };
+  }
+
+  var defaultOptions = {
+    minScore: 20,
+    minContentLength: 140,
+    visibilityChecker: isNodeVisible,
+  };
+  options = Object.assign(defaultOptions, options);
+
+  var nodes = doc.querySelectorAll("p, pre, article");
+
+  // Get <div> nodes which have <br> node(s) and append them into the `nodes` variable.
+  // Some articles' DOM structures might look like
+  // <div>
+  //   Sentences<br>
+  //   <br>
+  //   Sentences<br>
+  // </div>
+  var brNodes = doc.querySelectorAll("div > br");
+  if (brNodes.length) {
+    var set = new Set(nodes);
+    [].forEach.call(brNodes, function (node) {
+      set.add(node.parentNode);
+    });
+    nodes = Array.from(set);
+  }
+
+  var score = 0;
+  // This is a little cheeky, we use the accumulator 'score' to decide what to return from
+  // this callback:
+  return [].some.call(nodes, function (node) {
+    if (!options.visibilityChecker(node)) {
+      return false;
+    }
+
+    var matchString = node.className + " " + node.id;
+    if (
+      REGEXPS.unlikelyCandidates.test(matchString) &&
+      !REGEXPS.okMaybeItsACandidate.test(matchString)
+    ) {
+      return false;
+    }
+
+    if (node.matches("li p")) {
+      return false;
+    }
+
+    var textContentLength = node.textContent.trim().length;
+    if (textContentLength < options.minContentLength) {
+      return false;
+    }
+
+    score += Math.sqrt(textContentLength - options.minContentLength);
+
+    if (score > options.minScore) {
+      return true;
+    }
+    return false;
+  });
+}
+
 // -------------------------------------------------------------
 
 
@@ -2525,6 +2614,8 @@ function adaptTextToRegex(text){
   text = negativLoookbehindStart + '\\shighlightAttackOnReputation' + negativLoookbehindEnd + text;
   text = negativLoookbehindStart + '\\shighlightManipulativeWording' + negativLoookbehindEnd + text;
 
+  text = '(?<!share-body="<p>“)' + text;
+
   const regexText = `(${text})`;
   return regexText;
 }
@@ -2665,11 +2756,15 @@ function showClassificationFromResponse(response){
 
 function classifyText(){
     var clonedDocument = document.cloneNode(true);
+    //console.log(isProbablyReaderable(clonedDocument));
     var article = new Readability(clonedDocument).parse();
 
     var text;
 
-    if (article.title != article.excerpt){
+    // If the expert is the same as the title or the beginning of the text, ignore it
+    if ((article.title != article.excerpt) && 
+      (article.excerpt.substring(0, article.excerpt.length-3) != article.textContent.substring(0, article.excerpt.length-3) 
+      || article.excerpt.substring(article.excerpt.length - 3) != '...' )){
       text = article.title + '.' + article.excerpt + '.' + article.textContent;
     } else{
       text = article.title + '.' + article.textContent;
