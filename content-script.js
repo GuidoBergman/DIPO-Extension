@@ -2752,15 +2752,33 @@ function showClassificationFromResponse(response){
     
 }
 
+function fixTextContent(articleContent, articleText, readability){
+  const parser = new DOMParser();
+  const articleHTML = parser.parseFromString(articleContent, 'text/html');
+
+  let paragraphList = articleHTML.getElementById('readability-page-1').firstChild.children;
+  for (var i=0, max=paragraphList.length; i < max; i++) {
+      text = readability._getInnerText(paragraphList[i]);
+      if (text.substring(text.length -1) != '.'){
+        let regex = new RegExp(text);
+        articleText = articleText.replace(regex, text + '.');
+      }
+      
+  }		
+  return articleText;
+}
+
 
 
 function classifyText(){
     var clonedDocument = document.cloneNode(true);
     //console.log(isProbablyReaderable(clonedDocument));
-    var article = new Readability(clonedDocument).parse();
+    var readability = new Readability(clonedDocument)
+    var article = readability.parse();
+
+    article.textContent = fixTextContent(article.content, article.textContent, readability);
 
     var text;
-
     // If the expert is the same as the title or the beginning of the text, ignore it
     if ((article.title != article.excerpt) && 
       (article.excerpt.substring(0, article.excerpt.length-3) != article.textContent.substring(0, article.excerpt.length-3) 
