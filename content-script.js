@@ -2491,7 +2491,7 @@ function getModal(isLoading, countTechniques){
 
 
 function markElementsWithContentModelRestrictions(){
- var elements = document.querySelectorAll("h1, h2, h3, h4, h5, h6")
+ var elements = document.querySelectorAll("h1, h2, h3, h4, h5, h6, figcaption")
 
   for (var i=0, max=elements.length; i < max; i++) {
        elements[i].classList.add('restricted-element')
