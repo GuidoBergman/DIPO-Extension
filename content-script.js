@@ -2515,7 +2515,13 @@ function adaptTextToRegex(text){
   if (text.substring(text.length-10) == '(<[^>]+>)*'){
     text = text.substring(0,text.length-10);
   }
- 
+
+  negativLoookbehindStart = `(?<!restricted-element`
+  negativLoookbehindEnd = `">)`
+  text = negativLoookbehindStart +  negativLoookbehindEnd + text;
+  text = negativLoookbehindStart + '\\shighlightBoth' + negativLoookbehindEnd + text;
+  text = negativLoookbehindStart + '\\shighlightAttackOnReputation' + negativLoookbehindEnd + text;
+  text = negativLoookbehindStart + '\\shighlightManipulativeWording' + negativLoookbehindEnd + text;
 
   const regexText = `(${text})`;
   return regexText;
@@ -2543,9 +2549,16 @@ function highlightRestrictedElements(text, techniqueName) {
   var elements = document.getElementsByClassName("restricted-element");
   for (var i = 0; i < elements.length; i++) {
     var element = elements[i];
+    let elementError = false;
     if (element.textContent.includes(text)) {
       for (var j = 0; j < element.classList.length; j++) {
         if (element.classList[j].includes('highlight')) {
+          if (element.classList[j].includes(techniqueName)){
+            elementError = true;
+            break;
+          }
+
+
           element.classList.remove(element.classList[j]);
           element.classList.add('highlightBoth');
 
@@ -2557,6 +2570,10 @@ function highlightRestrictedElements(text, techniqueName) {
           explanation.firstChild.nextElementSibling.nextElementSibling.insertAdjacentHTML("beforebegin", getExplanationStr(techniqueName, false));
           return 'OK';
         }
+      }
+
+      if(elementError){
+        continue;
       }
       
       element.classList.add('highlight' + techniqueName);
