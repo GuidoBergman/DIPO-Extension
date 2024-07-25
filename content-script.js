@@ -2465,7 +2465,7 @@ function isProbablyReaderable(doc, options = {}) {
 
 
 
-//URL = "https://localhost:8000/classify"
+//URL = "http://localhost:8000/classify"
 URL = "https://dipo.net.ar/classify"
 
 const techniqueNamesDic = {

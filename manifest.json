@@ -11,7 +11,7 @@
   ],
   "content_security_policy": {
     "extension_pages": "script-src 'self'; object-src 'self'",
-    "content_scripts": "script-src 'self' https://localhost:8000 https://dipo.net.ar; connect-src https://localhost:8000 https://dipo.net.ar"
+    "content_scripts": "script-src 'self' http://localhost:8000 https://dipo.net.ar; connect-src http://localhost:8000 https://dipo.net.ar"
   },
   "icons": {
     "64": "icons/icon.png"
