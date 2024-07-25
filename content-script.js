@@ -2688,7 +2688,7 @@ function highlightRestrictedElements(text, techniqueName) {
 
 function highlightText(text, techniqueName) {
   if (highlightRestrictedElements(text, techniqueName) == 'OK'){
-    return;
+    return 1;
   }
 
 
@@ -2725,6 +2725,12 @@ function highlightText(text, techniqueName) {
   }
 
     document.body.innerHTML = highlightedContent;  
+
+    if (content == highlightedContent){
+      return 0;
+    } else{
+      return 1;
+    }
 }
 
 
@@ -2740,8 +2746,7 @@ function showClassificationFromResponse(response){
            let techniques = json[technique_name];
            console.log(techniques);
            for (var j = 0; j < techniques.length; j++) {
-              highlightText(techniques[j], technique_name);
-			        countTechniques += 1; 
+			        countTechniques += highlightText(techniques[j], technique_name);; 
            }
            
          }
