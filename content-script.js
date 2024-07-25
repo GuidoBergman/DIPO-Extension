@@ -2595,7 +2595,7 @@ function adaptTextToRegex(text){
   text = text.replace(regexEsc, replacerEsc);
 
   const regexNonAlpha = new RegExp('(?:\\\\.|[^a-z0-9áéíóúñü])', 'gi');
-  const replacer = (match) => `(<[^>]+>)*${match}(<[^>]+>)*`;
+  const replacer = (match) => `(<[^>]+>)*(${match}|&nbsp;)(<[^>]+>)*`;
   text = text.replace(regexNonAlpha, replacer);
 
   if (text.substring(0,10) == '(<[^>]+>)*'){
@@ -2716,7 +2716,6 @@ function highlightText(text, techniqueName) {
               <a href="#" class="close-link">X</a>
             </span>`);
   } else{
-
     highlightedContent = content.replace(regexText,
      `<span class="highlight${techniqueName}">
          $1
@@ -2772,7 +2771,7 @@ function fixTextContent(articleContent, articleText, readability){
 
 function classifyText(){
     var clonedDocument = document.cloneNode(true);
-    //console.log(isProbablyReaderable(clonedDocument));
+    console.log(isProbablyReaderable(clonedDocument));
     var readability = new Readability(clonedDocument)
     var article = readability.parse();
 
