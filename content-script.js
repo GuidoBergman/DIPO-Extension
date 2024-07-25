@@ -2469,14 +2469,16 @@ function isProbablyReaderable(doc, options = {}) {
 URL = "https://dipo.net.ar/classify"
 
 const techniqueNamesDic = {
-  'ManipulativeWording': 'Manipulative wording',
-  'AttackOnReputation': 'Attack on reputation'
+  'ManipulativeWording': 'Redacción manipulativa',
+  'AttackOnReputation': 'Ataque a la reputación'
 }
 
+
 const techniqueDescriptionDic = {
-  'ManipulativeWording': 'The text is not an argument per se, but uses specific language, which contains words or phrases that are either non-neutral, confusing, exaggerating, loaded, etc., in order to impact the reader emotionally.',
-  'AttackOnReputation': 'The argument does not address the topic, but rather targets the participant (personality, experience, deeds) in order to question and/or to undermine their credibility. The object of the argumentation can also refer to a group of individuals, an organization, an object, or an activity.'
+  'ManipulativeWording': 'El texto no es un argumento en sí, sino que utiliza un lenguaje específico, que contiene palabras o frases no neutras, confusas, exageradas, cargadas, etc., con el fin de impactar emocionalmente al lector.',
+  'AttackOnReputation': 'La argumentación no aborda el tema, sino que se dirige al participante (personalidad, experiencia, hechos) para cuestionar y/o socavar su credibilidad.'
 }
+
 
 var cssStyles = `
 #modal{
@@ -2659,7 +2661,7 @@ function highlightRestrictedElements(text, techniqueName) {
           explanation.classList.remove(element.classList[j]);
           explanation.classList.add('highlightBoth');
 
-          explanation.firstChild.nextElementSibling.nextSibling.nodeValue = ' and ';
+          explanation.firstChild.nextElementSibling.nextSibling.nodeValue = ' y ';
           explanation.firstChild.nextElementSibling.nextElementSibling.insertAdjacentHTML("beforebegin", getExplanationStr(techniqueName, false));
           return 'OK';
         }
@@ -2709,7 +2711,7 @@ function highlightText(text, techniqueName) {
        `<span class="highlightBoth">
           ${textHTML}
           <span class="explanation">
-            (<a href="#" class="info-link" data-target="${explanationId}">${techniqueNamesDic[techniqueName]}</a> and 
+            (<a href="#" class="info-link" data-target="${explanationId}">${techniqueNamesDic[techniqueName]}</a> y 
             <span id="${explanationId}" class="info-box hidden">
               <strong>${techniqueNamesDic[techniqueName]}: </strong>
               ${techniqueDescriptionDic[techniqueName]}
