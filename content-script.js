@@ -2728,6 +2728,7 @@ function highlightRestrictedElements(text, techniqueName) {
       }
       
       element.classList.add('highlight' + techniqueName);
+      element.style.marginBottom = '0';
 
       let tempContainer = document.createElement('div');
       tempContainer.innerHTML = getExplanationStr(techniqueName);
