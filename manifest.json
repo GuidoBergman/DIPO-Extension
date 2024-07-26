@@ -4,7 +4,8 @@
   "description": "Detect and classify persuasion techniques in text",
   "version": "0.0.1",
   "host_permissions": [
-    "<all_urls>"
+    "http://localhost:8000/*", 
+    "https://dipo.net.ar/*"
   ],
   "permissions": [
     "activeTab"
