@@ -2636,32 +2636,39 @@ function markElementsWithContentModelRestrictions(){
 
 
 function adaptTextToRegex(text){
+  // Ignore the period at the end (sometime it is artificially added)
+  if (text[text.length-1] == '.'){
+    text = text.substring(0, text.length-1);
+  }
 
+  // Escape characters (nessery for the regex)
   regexEsc = new RegExp('[.*+?^${}()|[\\]\\\\]', 'g');
   const replacerEsc = (match) => '\\' + match;
   text = text.replace(regexEsc, replacerEsc);
 
+  // Ignore HTML code
   const regexNonAlpha = new RegExp('(?:\\\\.|[^a-z0-9áéíóúñü])', 'gi');
   const replacer = (match) => `(<[^>]+>)*(${match}|&nbsp;)(<[^>]+>)*`;
   text = text.replace(regexNonAlpha, replacer);
 
+  // Don't ignore HTML code at the begining/end, except bold/strong
   if (text.substring(0,10) == '(<[^>]+>)*'){
     text = text.substring(10,text.length);
   }
   if (text.substring(text.length-10) == '(<[^>]+>)*'){
     text = text.substring(0,text.length-10);
   }
-
   text = '(<(strong|b)>)?' + text + '(<\/(strong|b)>)?';
 
+  // Don't include restrited elements, metadata and share-body
   negativLoookbehindStart = `(?<!restricted-element`
   negativLoookbehindEnd = `">)`
   text = negativLoookbehindStart +  negativLoookbehindEnd + text;
   text = negativLoookbehindStart + '\\shighlightBoth' + negativLoookbehindEnd + text;
   text = negativLoookbehindStart + '\\shighlightAttackOnReputation' + negativLoookbehindEnd + text;
   text = negativLoookbehindStart + '\\shighlightManipulativeWording' + negativLoookbehindEnd + text;
-
   text = '(?<!share-body="<p>“)' + text;
+  text = '(?<!:")' + text;
 
   const regexText = `(${text})`;
   return regexText;
@@ -2690,6 +2697,10 @@ function highlightRestrictedElements(text, techniqueName) {
   for (var i = 0; i < elements.length; i++) {
     var element = elements[i];
     let elementError = false;
+    // Ignore the period at the end (sometime it is artificially added)
+    if (text[text.length-1] == '.'){
+      text = text.substring(0, text.length-1);
+    }
     if (element.textContent.includes(text)) {
       for (var j = 0; j < element.classList.length; j++) {
         if (element.classList[j].includes('highlight')) {
@@ -2816,7 +2827,7 @@ function fixTextContent(articleContent, articleText, readability){
       text = readability._getInnerText(paragraphList[i]);
       if (text.substring(text.length -1) != '.'){
         let regex = new RegExp(text);
-        articleText = articleText.replace(regex, text + '.');
+        articleText = articleText.replace(regex, text + '. ');
       }
       
   }		
@@ -2840,9 +2851,9 @@ function classifyText(){
     if ((article.title != article.excerpt) && 
       (article.excerpt.substring(0, article.excerpt.length-3) != article.textContent.substring(0, article.excerpt.length-3) 
       || article.excerpt.substring(article.excerpt.length - 3) != '...' )){
-      text = article.title + '.' + article.excerpt + '.' + article.textContent;
+      text = article.title + '. ' + article.excerpt + '. ' + article.textContent;
     } else{
-      text = article.title + '.' + article.textContent;
+      text = article.title + '. ' + article.textContent;
     }
     console.log(text);
 
