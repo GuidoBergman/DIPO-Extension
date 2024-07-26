@@ -2827,7 +2827,9 @@ function fixTextContent(articleContent, articleText, readability){
 
 function classifyText(){
     var clonedDocument = document.cloneNode(true);
-    console.log(isProbablyReaderable(clonedDocument));
+    if (!isProbablyReaderable(clonedDocument)){
+      throw "Site not readable";
+    }
     var readability = new Readability(clonedDocument)
     var article = readability.parse();
 
