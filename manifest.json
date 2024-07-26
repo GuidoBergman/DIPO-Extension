@@ -27,5 +27,11 @@
   "web_accessible_resources": [{
     "resources": ["index.html"],
     "matches": ["<all_urls>"]
-  }]
+  }],
+  "browser_specific_settings": {
+  "gecko": {
+    "id": "dipo@detectorIntentosPersuasionOnline"
+  }
+}
+
 }
