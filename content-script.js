@@ -2479,6 +2479,12 @@ const techniqueDescriptionDic = {
   'AttackOnReputation': 'La argumentación no aborda el tema, sino que se dirige al participante (personalidad, experiencia, hechos) para cuestionar y/o socavar su credibilidad.'
 }
 
+const tootltipText = {
+  'loading': 'Buscando técnicas de persuasión',
+  'zeroFound':'No se han encontrado técnicas de persuasión',
+  'nonZeroFound': 'Se han encontrado X técnicas de persuasión',
+  'error': 'Ha ocurrido un error al buscar las técnicas de persuasión'
+}
 
 var cssStyles = `
 #modal{
@@ -2491,7 +2497,33 @@ var cssStyles = `
   top = '0px';
   right = '0px';
   z-index: 2147483647;
-  width:  max-content;
+  width: max-content;
+  cursor: pointer;
+}
+
+.tooltip {
+  position: absolute;
+  background-color: #333;
+  color: #fff;
+  padding: 8px 12px;
+  border-radius: 5px;
+  font-size: 14px;
+  line-height: 1.4;
+  text-align: center;
+  white-space: pre-line; 
+  width: 100px;
+  visibility: hidden;
+  opacity: 0;
+  transition: opacity 0.3s, visibility 0.3s;
+  top: 100%;
+  left: -50%;
+  margin-top: 7px;
+  z-index: 2147483647;
+}
+
+#modal:hover .tooltip {
+  visibility: visible;
+  opacity: 1;
 }
 
 @keyframes spin {
@@ -2538,7 +2570,7 @@ background: linear-gradient(to top right, #cc3300 0%, #ff0000 100%);
 
 
 
-function getModal(isLoading, countTechniques){
+function getModal(isLoading, countTechniques=0, error=false){
   fetch(chrome.runtime.getURL('index.html'))
   .then(response => response.text())
   .then(html => {
@@ -2562,15 +2594,28 @@ function getModal(isLoading, countTechniques){
     document.body.appendChild(shadowHost);
     modalElement = shadowRoot;
 
+    if(error){
+      modalElement.getElementById('tooltip').textContent = tootltipText['error'];
+      modalElement.getElementById('spinner-icon').classList.add('hidden');
+      modalElement.getElementById('results-count').classList.add('hidden');
+      modalElement.getElementById('img-error').classList.remove('hidden');
+      return; 
+    }
+
+    modalElement.getElementById('tooltip').textContent = tootltipText['loading'];
+
+
     if (!isLoading){
       let resultCount =  modalElement.getElementById('results-count');
       resultCount.innerHTML = countTechniques;
       if (countTechniques == 0){
          resultCount.classList.remove('non-zero-count');
          resultCount.classList.add('zero-count');
+         modalElement.getElementById('tooltip').textContent = tootltipText['zeroFound'];
       } else{
         resultCount.classList.add('non-zero-count');
         resultCount.classList.remove('zero-count');
+        modalElement.getElementById('tooltip').textContent = tootltipText['nonZeroFound'].replace('X', countTechniques);
       }
       
       modalElement.getElementById('spinner-icon').classList.add('hidden');
@@ -2729,6 +2774,7 @@ function highlightText(text, techniqueName) {
     document.body.innerHTML = highlightedContent;  
 
     if (content == highlightedContent){
+      console.log(regexText);
       return 0;
     } else{
       return 1;
@@ -2753,6 +2799,9 @@ function showClassificationFromResponse(response){
            
          }
         getModal(false, countTechniques);
+    }).catch(error => {
+        //console.error("Error processing response:", error);
+        getModal(false, 0, true); 
     });
 
     
@@ -2793,7 +2842,7 @@ function classifyText(){
     } else{
       text = article.title + '.' + article.textContent;
     }
-    console.log(text)
+    console.log(text);
 
     let body = {'text': text}
     body = JSON.stringify(body);
@@ -2805,7 +2854,11 @@ function classifyText(){
     let init = {method: 'POST', headers, body: body};
     let request = new Request(URL, init);
     fetch(request).
-      then(showClassificationFromResponse);
+      then(showClassificationFromResponse)
+      .catch(error => {
+        //console.error("Error in classification process:", error);
+        getModal(false, 0, true);  // Show error modal
+    });
 }
 
 function showExplanation(e){
@@ -2835,19 +2888,22 @@ function getNextId(technique) {
 }
 
 
-console.log('------------- START ------------------');
+function main(){
+  try{
+    var modalElement;
+    getModal(true, 0);
+    markElementsWithContentModelRestrictions();
+  
+    classifyText();
+  
+    document.addEventListener('click', function(e) {
+      showExplanation(e)
+    });
+  }
+  catch (e) {
+    getModal(false, 0, true);
+    //console.error(e);
+  }
+}
 
-var modalElement;
-getModal(true, 0);
-markElementsWithContentModelRestrictions();
-
-classifyText();
-
-document.addEventListener('click', function(e) {
-  showExplanation(e)
-});
-
-
-
-
-console.log('------------- END ------------------');
+main();
