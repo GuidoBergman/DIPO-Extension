@@ -2675,6 +2675,8 @@ function adaptTextToRegex(text){
   text = negativLoookbehindStart + '\\shighlightManipulativeWording' + negativLoookbehindEnd + text;
   text = '(?<!share-body="<p>“)' + text;
   text = '(?<!:")' + text;
+  text = '(?<!aria-label=")' + text;
+
 
   const regexText = `(${text})`;
   return regexText;
