@@ -2482,6 +2482,7 @@ const techniqueDescriptionDic = {
 const tootltipText = {
   'loading': 'Buscando técnicas de persuasión',
   'zeroFound':'No se han encontrado técnicas de persuasión',
+  'oneFound': 'Se ha encontrado 1 técnica de persuasión',
   'nonZeroFound': 'Se han encontrado X técnicas de persuasión',
   'error': 'Ha ocurrido un error al buscar las técnicas de persuasión'
 }
@@ -2615,7 +2616,12 @@ function getModal(isLoading, countTechniques=0, error=false){
       } else{
         resultCount.classList.add('non-zero-count');
         resultCount.classList.remove('zero-count');
-        modalElement.getElementById('tooltip').textContent = tootltipText['nonZeroFound'].replace('X', countTechniques);
+
+        if (countTechniques == 1){
+          modalElement.getElementById('tooltip').textContent = tootltipText['oneFound'];
+        } else {
+          modalElement.getElementById('tooltip').textContent = tootltipText['nonZeroFound'].replace('X', countTechniques);
+        }
       }
       
       modalElement.getElementById('spinner-icon').classList.add('hidden');
@@ -2641,7 +2647,7 @@ function adaptTextToRegex(text){
     text = text.substring(0, text.length-1);
   }
 
-  // Escape characters (nessery for the regex)
+  // Escape characters (necessary for the regex)
   regexEsc = new RegExp('[.*+?^${}()|[\\]\\\\]', 'g');
   const replacerEsc = (match) => '\\' + match;
   text = text.replace(regexEsc, replacerEsc);
@@ -2852,9 +2858,9 @@ function classifyText(){
     if ((article.title != article.excerpt) && 
       (article.excerpt.substring(0, article.excerpt.length-3) != article.textContent.substring(0, article.excerpt.length-3) 
       || article.excerpt.substring(article.excerpt.length - 3) != '...' )){
-      text = article.title + '. ' + article.excerpt + '. ' + article.textContent;
+      text = article.title + '.' + article.excerpt + '.' + article.textContent;
     } else{
-      text = article.title + '. ' + article.textContent;
+      text = article.title + '.' + article.textContent;
     }
     console.log(text);
 
