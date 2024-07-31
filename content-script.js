@@ -2829,17 +2829,19 @@ function showClassificationFromResponse(response){
 
 // Add periods when it is necessary to be able to properly split the sentence later
 function fixClonedDocument(document){
-  var elements = document.querySelectorAll("h1, h2, h3, h4, h5, h6, p, time, figcaption, .epigraphe, section, .date");
+  var elements = document.querySelectorAll("h1, h2, h3, h4, h5, h6, p, time, figcaption");
   for (var i=0, max=elements.length; i < max; i++) {
       text = elements[i].textContent;
-      let lastChar = text.substring(text.length -1);
-
-      let regexIsAlpha =  new RegExp('[a-z0-9]', 'i');
-      if (regexIsAlpha.test(lastChar)){
-          elements[i].textContent = text + '. ';
+      if (text.length < 1){
+        continue;
       }
-      else if (lastChar == '.'){
-        elements[i].textContent = text + ' ';
+
+
+      if ((text[text.length-1] != '.') && (text[text.length-2] != '.')){
+          elements[i].textContent += '. ';
+      }
+      else if (text[text.length-1] == '.'){
+        elements[i].textContent += ' ';
       }
 
   }
