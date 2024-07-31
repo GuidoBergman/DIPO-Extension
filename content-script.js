@@ -2792,7 +2792,6 @@ function highlightText(text, techniqueName) {
     document.body.innerHTML = highlightedContent;  
 
     if (content == highlightedContent){
-      console.log(regexText);
       return 0;
     } else{
       return 1;
@@ -2825,42 +2824,48 @@ function showClassificationFromResponse(response){
     
 }
 
-function fixTextContent(articleContent, articleText, readability){
-  const parser = new DOMParser();
-  const articleHTML = parser.parseFromString(articleContent, 'text/html');
 
-  let paragraphList = articleHTML.getElementById('readability-page-1').firstChild.children;
-  for (var i=0, max=paragraphList.length; i < max; i++) {
-      text = readability._getInnerText(paragraphList[i]);
-      if (text.substring(text.length -1) != '.'){
-        let regex = new RegExp(text);
-        articleText = articleText.replace(regex, text + '. ');
+// Add periods when it is necessary to be able to properly split the sentence later
+function fixClonedDocument(document){
+  var elements = document.querySelectorAll("h1, h2, h3, h4, h5, h6, p, time, figcaption, .epigraphe, section, .date");
+  for (var i=0, max=elements.length; i < max; i++) {
+      text = elements[i].textContent;
+      let lastChar = text.substring(text.length -1);
+
+      let regexIsAlpha =  new RegExp('[a-z0-9]', 'i');
+      if (regexIsAlpha.test(lastChar)){
+          elements[i].textContent = text + '. ';
       }
-      
-  }		
-  return articleText;
-}
+      else if (lastChar == '.'){
+        elements[i].textContent = text + ' ';
+      }
 
+  }
+
+  return document;
+}
 
 
 function classifyText(){
     var clonedDocument = document.cloneNode(true);
     if (!isProbablyReaderable(clonedDocument)){
       throw "Site not readable";
+      console.error('Site not readable');
     }
+
+    clonedDocument = fixClonedDocument(clonedDocument);
     var readability = new Readability(clonedDocument)
     var article = readability.parse();
 
-    article.textContent = fixTextContent(article.content, article.textContent, readability);
 
     var text;
     // If the expert is the same as the title or the beginning of the text, ignore it
     if ((article.title != article.excerpt) && 
       (article.excerpt.substring(0, article.excerpt.length-3) != article.textContent.substring(0, article.excerpt.length-3) 
       || article.excerpt.substring(article.excerpt.length - 3) != '...' )){
-      text = article.title + '.' + article.excerpt + '.' + article.textContent;
+      text = article.title + '. ' + article.excerpt + '. ' + article.textContent;
     } else{
-      text = article.title + '.' + article.textContent;
+      text = article.title + '. ' + article.textContent;
     }
     console.log(text);
 
