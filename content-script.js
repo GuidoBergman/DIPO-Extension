@@ -2468,6 +2468,9 @@ function isProbablyReaderable(doc, options = {}) {
 //URL = "http://localhost:8000/classify"
 URL = "https://dipo.net.ar/classify"
 
+
+const MAX_LENGTH = 45000;
+
 const techniqueNamesDic = {
   'ManipulativeWording': 'Redacción manipulativa',
   'AttackOnReputation': 'Ataque a la reputación'
@@ -2734,7 +2737,7 @@ function highlightRestrictedElements(text, techniqueName) {
       if(elementError){
         continue;
       }
-      
+
       element.classList.add('highlight' + techniqueName);
       element.style.marginBottom = '0';
 
@@ -2802,28 +2805,25 @@ function highlightText(text, techniqueName) {
 
 
 
-
-function showClassificationFromResponse(response){   
-    response.json().then(json => {
-        let countTechniques = 0;
-        let technique_names = Object.keys(json);
-        for (var i = 0; i < technique_names.length; i++) {
-           let technique_name = String(technique_names[i]);
-           console.log(technique_name);
-           let techniques = json[technique_name];
-           console.log(techniques);
-           for (var j = 0; j < techniques.length; j++) {
-			        countTechniques += highlightText(techniques[j], technique_name);; 
-           }
-           
-         }
-        getModal(false, countTechniques);
-    }).catch(error => {
-        //console.error("Error processing response:", error);
-        getModal(false, 0, true); 
-    });
-
-    
+async function showClassificationFromResponse(response, countTechniques) {
+  try {
+      const json = await response.json();
+      let technique_names = Object.keys(json);
+      for (let i = 0; i < technique_names.length; i++) {
+          let technique_name = String(technique_names[i]);
+          console.log(technique_name);
+          let techniques = json[technique_name];
+          console.log(techniques);
+          for (let j = 0; j < techniques.length; j++) {
+              countTechniques += highlightText(techniques[j], technique_name);
+          }
+      }
+      getModal(false, countTechniques);
+      return countTechniques;
+  } catch (error) {
+      getModal(false, 0, true);
+      return 0;
+  }
 }
 
 
@@ -2850,44 +2850,82 @@ function fixClonedDocument(document){
 }
 
 
-function classifyText(){
-    var clonedDocument = document.cloneNode(true);
-    if (!isProbablyReaderable(clonedDocument)){
-      throw "Site not readable";
-      console.error('Site not readable');
+function splitTextIntoChunks(text, maxLength) {
+  const chunks = [];
+  let remainingText = text;
+
+  while (remainingText.length > maxLength) {
+    let chunkEnd = maxLength;
+
+    const lastPeriodIndex = remainingText.lastIndexOf('.', maxLength);
+    if (lastPeriodIndex > 0) {
+      chunkEnd = lastPeriodIndex + 1; // Include the period
+    } else {
+
+      const lastSpaceIndex = remainingText.lastIndexOf(' ', maxLength);
+      if (lastSpaceIndex > 0) {
+        chunkEnd = lastSpaceIndex + 1; // Include the space
+      }
     }
 
-    clonedDocument = fixClonedDocument(clonedDocument);
-    var readability = new Readability(clonedDocument)
-    var article = readability.parse();
+    chunks.push(remainingText.slice(0, chunkEnd).trim());
+    remainingText = remainingText.slice(chunkEnd).trim();
+  }
+
+  // Add any remaining text as the last chunk
+  if (remainingText.length > 0) {
+    chunks.push(remainingText);
+  }
+  
+  return chunks;
+}
 
 
-    var text;
-    // If the expert is the same as the title or the beginning of the text, ignore it
-    if ((article.title != article.excerpt) && 
-      (article.excerpt.substring(0, article.excerpt.length-3) != article.textContent.substring(0, article.excerpt.length-3) 
-      || article.excerpt.substring(article.excerpt.length - 3) != '...' )){
-      text = article.title + '. ' + article.excerpt + '. ' + article.textContent;
-    } else{
-      text = article.title + '. ' + article.textContent;
-    }
-    console.log(text);
+async function classifyText() {
+  var clonedDocument = document.cloneNode(true);
+  if (!isProbablyReaderable(clonedDocument)) {
+    throw "Site not readable";
+    console.error('Site not readable');
+  }
 
-    let body = {'text': text}
+  clonedDocument = fixClonedDocument(clonedDocument);
+  var readability = new Readability(clonedDocument)
+  var article = readability.parse();
+
+
+  var text;
+  // If the expert is the same as the title or the beginning of the text, ignore it
+  if ((article.title != article.excerpt) &&
+      (article.excerpt.substring(0, article.excerpt.length - 3) != article.textContent.substring(0, article.excerpt.length - 3)
+          || article.excerpt.substring(article.excerpt.length - 3) != '...')) {
+    text = article.title + '. ' + article.excerpt + '. ' + article.textContent;
+  } else {
+    text = article.title + '. ' + article.textContent;
+  }
+  console.log(text);
+
+  let textChunks = splitTextIntoChunks(text, MAX_LENGTH);
+
+  var countTechniques = 0;
+  for (let index = 0; index < textChunks.length; index++) {
+    let body = {'text': textChunks[index]};
     body = JSON.stringify(body);
     let headers = new Headers({
-        'Accept': 'application/json',
-        'Content-Type': 'application/json',
-        'Content-Length': body.length.toString()}
-    );
+      'Accept': 'application/json',
+      'Content-Type': 'application/json',
+      'Content-Length': body.length.toString()
+    });
     let init = {method: 'POST', headers, body: body};
     let request = new Request(URL, init);
-    fetch(request).
-      then(showClassificationFromResponse)
-      .catch(error => {
-        //console.error("Error in classification process:", error);
-        getModal(false, 0, true);  // Show error modal
-    });
+
+    try {
+      const response = await fetch(request);
+      countTechniques = await showClassificationFromResponse(response, countTechniques);
+    } catch (error) {
+      //console.error("Error in classification process:", error);
+      getModal(false, 0, true);  // Show error modal
+    }
+  }
 }
 
 function showExplanation(e){
