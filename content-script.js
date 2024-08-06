@@ -2955,13 +2955,13 @@ function getNextId(technique) {
 }
 
 
-function main(){
+async function main(){
   try{
     var modalElement;
     getModal(true, 0);
     markElementsWithContentModelRestrictions();
   
-    classifyText();
+    await classifyText();
   
     document.addEventListener('click', function(e) {
       showExplanation(e)
